@@ -12,6 +12,7 @@ QUERY = ""
 
 SAVE = False
 
+VERBOSE = False
 
 def default_preprocess(tweet):
     return re.sub(r"\s+", " ", tweet)  # Normalize whitespace. Replace tabs and newlines with single spaces

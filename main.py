@@ -85,4 +85,4 @@ def grid_search_combo_tweets(m, n):
 # grid_search_combo_tweets(0, 10)
 
 TextblobTweets(db=db, collection=collection, query=query, subjectivity_threshold=0.1, polarity_threshold=0.3,
-               save=True).run().test().print()
+               save=True, verbose=True).run().test().print()

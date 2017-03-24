@@ -1,4 +1,4 @@
-from time import time
+from time import time, strftime, gmtime
 
 import methods.defaults as d
 
@@ -6,9 +6,10 @@ import methods.defaults as d
 class Method:
     def __init__(self, name="Method", positive_file=d.POSITIVE_FILE, negative_file=d.NEGATIVE_FILE,
                  neutral_file=d.NEUTRAL_FILE,
-                 db=d.DB, collection=d.COLLECTION, query=d.QUERY, preprocess=d.PREPROCESS, save=d.SAVE):
+                 db=d.DB, collection=d.COLLECTION, query=d.QUERY, preprocess=d.PREPROCESS, save=d.SAVE, verbose=d.VERBOSE):
 
         self.name = name
+        self.verbose = verbose
 
         self.save = save
         self.positive_file = positive_file
@@ -45,8 +46,13 @@ class Method:
             neu_file = open(self.neutral_file, "w+")
 
         tweets = self.collection.find(self.query)
+        total_num_tweets = tweets.count()
 
         for index, tweet in enumerate(tweets):
+
+            # Print progress if verbose
+            if self.verbose and index % 10000 == 0:
+                print(index, "tweets\t", round(100 * index / float(total_num_tweets)), '%\t', strftime("%H:%M:%S", gmtime(time() - start_time)))
 
             # Preprocessing
             original_tweet = tweet["text"]
