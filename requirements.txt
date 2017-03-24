@@ -2,3 +2,5 @@ tweet-preprocessor
 afinn
 textblob
 vaderSentiment
+pymongo
+requests
