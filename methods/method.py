@@ -1,7 +1,7 @@
 from time import time, strftime, gmtime
 
 import methods.defaults as d
-
+from methods.utils import safe_division
 
 class Method:
     def __init__(self, name="Method", positive_file=d.POSITIVE_FILE, negative_file=d.NEGATIVE_FILE,
@@ -27,7 +27,21 @@ class Method:
         self.total_num_tweets = collection.find().count()
         self.num_tweets = -1
         self.run_time = -1
-        self.score = None
+
+        # Evaluation metrics
+        self.accuracy = None
+        self.precision_positive = None
+        self.precision_negative = None
+        self.precision_neutral = None
+
+        self.recall_positive = None
+        self.recall_negative = None
+        self.recall_neutral = None
+
+        self.F1_pos = None
+        self.F1_neg = None
+        self.F1_neu = None
+        self.F1_pn = None
 
     def classify(self, tweet):
         """
@@ -91,15 +105,43 @@ class Method:
         :return: Accuracy
         """
         num_tweets = len(self.sentiment_map)
-        num_corrects = 0
+
+        num_classified_as = {"positive": 0, "negative": 0, "neutral": 0}
+        num_corrects_as = {"positive": 0, "negative": 0, "neutral": 0}
+        actuals = {"positive": 0, "negative": 0, "neutral": 0}
+
         tweets = self.collection.find(self.query)
         for tweet in tweets:
             if tweet['id_str'] not in self.sentiment_map:
                 continue
-            if tweet['sentiment'] == self.sentiment_map[tweet['id_str']]:
-                num_corrects += 1
+            correct_sentiment = tweet['sentiment']
+            prediction = self.sentiment_map[tweet['id_str']]
+            actuals[correct_sentiment] += 1
+            num_classified_as[prediction] += 1
+            if correct_sentiment == prediction:
+                if correct_sentiment == "positive":
+                    num_corrects_as["positive"] += 1
+                elif correct_sentiment == "negative":
+                    num_corrects_as["negative"] += 1
+                elif correct_sentiment == "neutral":
+                    num_corrects_as["neutral"] += 1
 
-        self.score = num_corrects / float(num_tweets)
+        total_num_correct = sum(map(lambda item: item[1], num_corrects_as.items()))
+        self.accuracy = safe_division(total_num_correct, num_tweets)
+
+        self.precision_positive = safe_division(num_corrects_as["positive"], num_classified_as["positive"])
+        self.precision_negative = safe_division(num_corrects_as["negative"], num_classified_as["negative"])
+        self.precision_neutral = safe_division(num_corrects_as["neutral"], num_classified_as["neutral"])
+
+        self.recall_positive = safe_division(num_corrects_as["positive"], actuals["positive"])
+        self.recall_negative = safe_division(num_corrects_as["negative"], actuals["negative"])
+        self.recall_neutral = safe_division(num_corrects_as["neutral"], actuals["neutral"])
+
+        self.F1_pos = safe_division(2 * self.precision_positive * self.recall_positive, self.precision_positive + self.recall_positive)
+        self.F1_neg = safe_division(2 * self.precision_negative * self.recall_negative, self.precision_negative + self.recall_negative)
+        self.F1_neu = safe_division(2 * self.precision_neutral * self.recall_neutral, self.precision_neutral + self.recall_neutral)
+
+        self.F1_pn = safe_division(self.F1_pos + self.F1_neg, 2)
 
         return self
 
@@ -108,7 +150,13 @@ class Method:
         Prints a line of execution stats
         :return: self
         """
-        print(self.name, "\t", self.num_tweets, "\t", round(self.run_time, 2), 'sec\t',
-              round(1000 * self.run_time / float(self.total_num_tweets), 2), 'ms/tweet\t',
-              round(100 * self.score, 2), '%')
+        print(self.name, self.num_tweets, safe_division(self.num_tweets, self.total_num_tweets), sep="\t\t")
+        print("Time\t", str(round(self.run_time, 2)) + ' sec', str(round(1000 * self.run_time / float(self.total_num_tweets), 2)) + ' ms/tweet', sep="\t")
+        print("Precision", self.precision_positive, self.precision_negative, self.precision_neutral, sep="\t")
+        print("Recall\t", self.recall_positive, self.recall_negative, self.recall_neutral, sep="\t")
+        print("F1\t\t", self.F1_pos, self.F1_neg, self.F1_neu, sep="\t")
+        print("F1-pn\t", self.F1_pn, sep="\t")
+        print("Accuracy", self.accuracy, sep="\t")
+        print()
+
         return self
