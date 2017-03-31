@@ -3,10 +3,12 @@ from time import time, strftime, gmtime
 import methods.defaults as d
 from methods.utils import safe_division
 
+from pymongo import MongoClient
+
 class Method:
     def __init__(self, name="Method", positive_file=d.POSITIVE_FILE, negative_file=d.NEGATIVE_FILE,
                  neutral_file=d.NEUTRAL_FILE,
-                 db=d.DB, collection=d.COLLECTION, query=d.QUERY, preprocess=d.PREPROCESS, save=d.SAVE, verbose=d.VERBOSE):
+                 db_name=d.DB_NAME, collection_name=d.COLLECTION_NAME, query=d.QUERY, preprocess=d.PREPROCESS, save=d.SAVE, verbose=d.VERBOSE):
 
         self.name = name
         self.verbose = verbose
@@ -16,15 +18,17 @@ class Method:
         self.negative_file = negative_file
         self.neutral_file = neutral_file
 
-        self.db = db
-        self.collection = collection
+        # MongoDB connection
+        client = MongoClient()
+        self.db = client[db_name]
+        self.collection = self.db[collection_name]
         self.query = query
 
         self.sentiment_map = {}
 
         self.preprocessor = preprocess
 
-        self.total_num_tweets = collection.find().count()
+        self.total_num_tweets = self.collection.find(query).count()
         self.num_tweets = -1
         self.run_time = -1
 
@@ -42,6 +46,7 @@ class Method:
         self.F1_neg = None
         self.F1_neu = None
         self.F1_pn = None
+        self.F1_pnn = None
 
     def classify(self, tweet):
         """
@@ -114,17 +119,15 @@ class Method:
         for tweet in tweets:
             if tweet['id_str'] not in self.sentiment_map:
                 continue
+
             correct_sentiment = tweet['sentiment']
-            prediction = self.sentiment_map[tweet['id_str']]
             actuals[correct_sentiment] += 1
+
+            prediction = self.sentiment_map[tweet['id_str']]
             num_classified_as[prediction] += 1
+
             if correct_sentiment == prediction:
-                if correct_sentiment == "positive":
-                    num_corrects_as["positive"] += 1
-                elif correct_sentiment == "negative":
-                    num_corrects_as["negative"] += 1
-                elif correct_sentiment == "neutral":
-                    num_corrects_as["neutral"] += 1
+                num_corrects_as[correct_sentiment] += 1
 
         total_num_correct = sum(map(lambda item: item[1], num_corrects_as.items()))
         self.accuracy = safe_division(total_num_correct, num_tweets)
@@ -142,6 +145,7 @@ class Method:
         self.F1_neu = safe_division(2 * self.precision_neutral * self.recall_neutral, self.precision_neutral + self.recall_neutral)
 
         self.F1_pn = safe_division(self.F1_pos + self.F1_neg, 2)
+        self.F1_pnn = safe_division(self.F1_pos + self.F1_neg + self.F1_neu, 3)
 
         return self
 
@@ -152,11 +156,21 @@ class Method:
         """
         print(self.name, self.num_tweets, safe_division(self.num_tweets, self.total_num_tweets), sep="\t\t")
         print("Time\t", str(round(self.run_time, 2)) + ' sec', str(round(1000 * self.run_time / float(self.total_num_tweets), 2)) + ' ms/tweet', sep="\t")
+        print("Numbers", {v: k for k, v in self.sentiment_map.items()}.items())
         print("Precision", self.precision_positive, self.precision_negative, self.precision_neutral, sep="\t")
         print("Recall\t", self.recall_positive, self.recall_negative, self.recall_neutral, sep="\t")
         print("F1\t\t", self.F1_pos, self.F1_neg, self.F1_neu, sep="\t")
         print("F1-pn\t", self.F1_pn, sep="\t")
+        print("F1-pnn\t", self.F1_pnn, sep="\t")
         print("Accuracy", self.accuracy, sep="\t")
         print()
 
+        return self
+
+    def latex(self, *args):
+        """
+        Prints its execution stats as a LaTeX table line
+        :return: self
+        """
+        print(*args, self.accuracy, self.F1_pn, self.F1_pos, self.F1_neg, self.F1_neu, safe_division(self.num_tweets, self.total_num_tweets), str(round(1000 * self.run_time / float(self.total_num_tweets), 2)) + " \\\\", sep=" & ")
         return self

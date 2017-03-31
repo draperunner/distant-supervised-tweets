@@ -6,8 +6,8 @@ NEGATIVE_FILE = 'tweets.neg.tsv'
 NEUTRAL_FILE = 'tweets.neu.tsv'
 
 # MongoDB connection
-DB = None
-COLLECTION = None
+DB_NAME = "tweets"
+COLLECTION_NAME = "semeval"
 QUERY = ""
 
 SAVE = False
