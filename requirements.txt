@@ -4,3 +4,4 @@ textblob
 vaderSentiment
 pymongo
 requests
+joblib
