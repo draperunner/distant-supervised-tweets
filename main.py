@@ -8,6 +8,8 @@ from methods.afinn_tweets import AfinnTweets
 from methods.vader_tweets import VaderTweets
 from methods.combo_tweets import ComboTweets
 from methods.textblob_tweets import TextblobTweets
+from methods.emoticon_tweets import EmoticonTweets
+from methods.emoticon_extended_tweets import EmoticonExtendedTweets
 
 # MongoDB query
 query = {
@@ -74,7 +76,7 @@ def grid_search_textblob(m, n):
 
 def partial_grid(a, b, m, n):
     for c in range(m, n):
-        for d in range(m, n):
+        for d in range(0, 4):
             if a == b == c and a > 1:
                 continue
             ComboTweets(query=query, a=a, b=b, c=c, d=d).run().test().latex(a / 10., b / 10., c / 10., d / 10.)
@@ -98,9 +100,11 @@ def tooopl(a, b):
 #grid_search_combo_tweets(0, 10)
 
 #AfinnTweets(db=db, collection=collection, query=query).run().test().latex()
+EmoticonTweets(query=query).run().test().latex()
+EmoticonExtendedTweets(query=query).run().test().latex()
 #VaderTweets(db=db, collection=collection, query=query, threshold=0.1).run().test().latex()
 #TextblobTweets(db=db, collection=collection, query=query, subjectivity_threshold=0.1, polarity_threshold=0.3.run().test().latex()
-from joblib import Parallel, delayed
-num_cores = multiprocessing.cpu_count()
-squares = Parallel(n_jobs=num_cores, verbose=50)(delayed(partial_grid)(a, b, 0, 10,) for a, b in tooopl(0, 10))
-print('done')
+#from joblib import Parallel, delayed
+#num_cores = multiprocessing.cpu_count()
+#squares = Parallel(n_jobs=num_cores, verbose=50)(delayed(partial_grid)(a, b, 0, 10,) for a, b in tooopl(0, 10))
+#print('done')
