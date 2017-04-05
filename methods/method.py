@@ -32,6 +32,8 @@ class Method:
         self.num_tweets = -1
         self.run_time = -1
 
+        self.tested = False
+
         # Evaluation metrics
         self.accuracy = None
         self.precision_positive = None
@@ -147,6 +149,8 @@ class Method:
         self.F1_pn = safe_division(self.F1_pos + self.F1_neg, 2)
         self.F1_pnn = safe_division(self.F1_pos + self.F1_neg + self.F1_neu, 3)
 
+        self.tested = True
+
         return self
 
     def print(self):
@@ -156,6 +160,11 @@ class Method:
         """
         print(self.name, self.num_tweets, safe_division(self.num_tweets, self.total_num_tweets), sep="\t\t")
         print("Time\t", str(round(self.run_time, 2)) + ' sec', str(round(1000 * self.run_time / float(self.total_num_tweets), 2)) + ' ms/tweet', sep="\t")
+
+        # Stop printing if self.test() has not been called
+        if not self.tested:
+            return self
+
         print("Numbers", {v: k for k, v in self.sentiment_map.items()}.items())
         print("Precision", self.precision_positive, self.precision_negative, self.precision_neutral, sep="\t")
         print("Recall\t", self.recall_positive, self.recall_negative, self.recall_neutral, sep="\t")
