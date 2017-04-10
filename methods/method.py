@@ -5,6 +5,7 @@ from methods.utils import safe_division
 
 from pymongo import MongoClient
 
+
 class Method:
     def __init__(self, name="Method", positive_file=d.POSITIVE_FILE, negative_file=d.NEGATIVE_FILE,
                  neutral_file=d.NEUTRAL_FILE,

@@ -7,6 +7,7 @@ from pymongo import MongoClient
 from methods.afinn_tweets import AfinnTweets
 from methods.vader_tweets import VaderTweets
 from methods.combo_tweets import ComboTweets
+from methods.lexicon_classifier import LexiconClassifier
 from methods.textblob_tweets import TextblobTweets
 from methods.emoticon_tweets import EmoticonTweets
 from methods.emoticon_extended_tweets import EmoticonExtendedTweets
@@ -100,8 +101,9 @@ def tooopl(a, b):
 #grid_search_combo_tweets(0, 10)
 
 #AfinnTweets(db=db, collection=collection, query=query).run().test().latex()
-EmoticonTweets(query=query).run().test().latex()
-EmoticonExtendedTweets(query=query).run().test().latex()
+#EmoticonTweets(query=query).run().test().latex()
+#EmoticonExtendedTweets(query=query).run().test().latex()
+LexiconClassifier(query=query).run().test().print()
 #VaderTweets(db=db, collection=collection, query=query, threshold=0.1).run().test().latex()
 #TextblobTweets(db=db, collection=collection, query=query, subjectivity_threshold=0.1, polarity_threshold=0.3.run().test().latex()
 #from joblib import Parallel, delayed

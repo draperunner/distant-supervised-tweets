@@ -5,3 +5,4 @@ vaderSentiment
 pymongo
 requests
 joblib
+git+ssh://git@github.com/draperunner/fjlc.git
