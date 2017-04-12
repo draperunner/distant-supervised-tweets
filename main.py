@@ -11,6 +11,7 @@ from methods.lexicon_classifier import LexiconClassifier
 from methods.textblob_tweets import TextblobTweets
 from methods.emoticon_tweets import EmoticonTweets
 from methods.emoticon_extended_tweets import EmoticonExtendedTweets
+from time import time
 
 # MongoDB query
 query = {
@@ -60,8 +61,7 @@ def grid_search_vader(m, n):
     TEXTBLOB, no preprocessing
     """
     for i in range(m, n):
-        print(i / 10.)
-        VaderTweets(query=query, threshold=i / 10.).run().test().print()
+        VaderTweets(query=query, threshold=i / 10.).run().test().latex()
 
 
 def grid_search_textblob(m, n):
@@ -75,18 +75,22 @@ def grid_search_textblob(m, n):
                            polarity_threshold=j / 10.).run().test().latex(i / 10., j / 10.)
 
 
-def partial_grid(a, b, m, n):
-    for c in range(m, n):
-        for d in range(0, 4):
-            if a == b == c and a > 1:
-                continue
-            ComboTweets(query=query, a=a, b=b, c=c, d=d).run().test().latex(a / 10., b / 10., c / 10., d / 10.)
-
-
 def grid_search_combo_tweets(m, n):
+    t = time()
+    best_performing = []
     for a in range(m, n):
         for b in range(m, n):
-            partial_grid(a, b, m, n)
+            for c in range(m, n):
+                for d in range(0, 4):
+                    if a == b == c and a > 1:
+                        continue
+                    ct = ComboTweets(query=query, a=a, b=b, c=c, d=d).run().test()
+                    best_performing.append(ct)
+        print("a", a, time() - t)
+
+    best_performing.sort(key=lambda q: q.F1_pnn)
+    for x in best_performing[-10:]:
+        x.latex(x.a / 10., x.b / 10., x.c / 10., x.d / 10.)
 
 
 def tooopl(a, b):
@@ -98,15 +102,16 @@ def tooopl(a, b):
 
 # grid_search_vader(1, 9)
 # grid_search_textblob(1, 4)
-#grid_search_combo_tweets(0, 10)
+# grid_search_combo_tweets(0, 5)
 
-#AfinnTweets(db=db, collection=collection, query=query).run().test().latex()
-#EmoticonTweets(query=query).run().test().latex()
-#EmoticonExtendedTweets(query=query).run().test().latex()
-LexiconClassifier(query=query).run().test().print()
-#VaderTweets(db=db, collection=collection, query=query, threshold=0.1).run().test().latex()
-#TextblobTweets(db=db, collection=collection, query=query, subjectivity_threshold=0.1, polarity_threshold=0.3.run().test().latex()
-#from joblib import Parallel, delayed
-#num_cores = multiprocessing.cpu_count()
-#squares = Parallel(n_jobs=num_cores, verbose=50)(delayed(partial_grid)(a, b, 0, 10,) for a, b in tooopl(0, 10))
-#print('done')
+def compare_methods():
+    AfinnTweets(query=query).run().test().latex()
+    EmoticonTweets(query=query).run().test().latex()
+    EmoticonExtendedTweets(query=query).run().test().latex()
+    VaderTweets(query=query, threshold=0.1).run().test().latex()
+    TextblobTweets(query=query, subjectivity_threshold=0.1, polarity_threshold=0.3).run().test().latex()
+    LexiconClassifier(query=query).run().test().latex()
+    ComboTweets(query=query, a=0, b=4, c=4, d=2).run().test().latex()
+    ComboTweets(query=query, a=3, b=1, c=1, d=1).run().test().latex()
+
+compare_methods()

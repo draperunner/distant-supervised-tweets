@@ -182,5 +182,5 @@ class Method:
         Prints its execution stats as a LaTeX table line
         :return: self
         """
-        print(*args, self.accuracy, self.F1_pn, self.F1_pos, self.F1_neg, self.F1_neu, safe_division(self.num_tweets, self.total_num_tweets), str(round(1000 * self.run_time / float(self.total_num_tweets), 2)) + " \\\\", sep=" & ")
+        print(*args, self.accuracy, self.F1_pnn, self.F1_pn, self.F1_pos, self.F1_neg, self.F1_neu, safe_division(self.num_tweets, self.total_num_tweets), str(round(1000 * self.run_time / float(self.total_num_tweets), 2)) + " \\\\", sep=" & ")
         return self
