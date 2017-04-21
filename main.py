@@ -1,3 +1,4 @@
+import copy
 import re
 
 import multiprocessing
@@ -93,16 +94,50 @@ def grid_search_combo_tweets(m, n):
         x.latex(x.a / 10., x.b / 10., x.c / 10., x.d / 10.)
 
 
-def tooopl(a, b):
-    tuples = []
-    for i in range(a, b):
-        for j in range(a, b):
-            tuples.append((i, j))
-    return tuples
+def run_and_train_methods(q=query):
+    return [
+        AfinnTweets(query=q).run().test(),
+        EmoticonTweets(query=q).run().test(),
+        EmoticonExtendedTweets(query=q).run().test(),
+        VaderTweets(query=q, threshold=0.1).run().test(),
+        TextblobTweets(query=q, subjectivity_threshold=0.1, polarity_threshold=0.3).run().test(),
+        LexiconClassifier(query=q).run().test(),
+        ComboTweets(query=q, a=0, b=4, c=4, d=2).run().test(),
+        ComboTweets(query=q, a=3, b=1, c=1, d=1).run().test()
+    ]
+
+
+def compare_methods(q=query):
+    for method in run_and_train_methods(q):
+        method.latex()
+
+
+def compare_for_each_semeval_set():
+    sets = [
+        "semeval-2013-dev-A",
+        "semeval-2013-test-A",
+        "semeval-2013-train-A",
+        "semeval-2014-sarcasm-A",
+        "semeval-2014-test-A",
+        "semeval-2015-test-A",
+        "semeval-2015-train-A",
+        "semeval-2016-dev-A",
+        "semeval-2016-devtest-A",
+        "semeval-2016-test-A",
+        "semeval-2016-train-A"
+    ]
+
+    for set in sets:
+        print(set)
+        q = copy.copy(query)
+        q['semeval_set'] = set
+        for method in run_and_train_methods():
+            print(method.name + "\t" + method.results.F1_pnn)
 
 # grid_search_vader(1, 9)
 # grid_search_textblob(1, 4)
 # grid_search_combo_tweets(0, 5)
+
 
 def compare_methods():
     AfinnTweets(query=query).run().test().latex()
@@ -128,4 +163,8 @@ def create_datasets():
 
 # LexiconClassifier(query=query, save=True).run()
 
-create_datasets()
+# create_datasets()
+
+# compare_methods()
+compare_for_each_semeval_set()
+
