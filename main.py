@@ -134,20 +134,6 @@ def compare_for_each_semeval_set():
         for method in run_and_train_methods(q):
             print(method.name + "\t" + str(method.F1_pnn))
 
-# grid_search_vader(1, 9)
-# grid_search_textblob(1, 4)
-# grid_search_combo_tweets(0, 5)
-
-
-def compare_methods():
-    AfinnTweets(query=query).run().test().latex()
-    EmoticonTweets(query=query).run().test().latex()
-    EmoticonExtendedTweets(query=query).run().test().latex()
-    VaderTweets(query=query, threshold=0.1).run().test().latex()
-    TextblobTweets(query=query, subjectivity_threshold=0.1, polarity_threshold=0.3).run().test().latex()
-    LexiconClassifier(query=query).run().test().latex()
-    ComboTweets(query=query, a=0, b=4, c=4, d=2).run().test().latex()
-    ComboTweets(query=query, a=3, b=1, c=1, d=1).run().test().latex()
 
 def create_datasets():
     AfinnTweets(query=query, save=True).run()
