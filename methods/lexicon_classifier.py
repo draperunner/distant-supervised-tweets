@@ -1,5 +1,6 @@
-from methods.method import Method
 import fjlc
+
+from methods.method import Method
 
 
 class LexiconClassifier(Method):

@@ -1,9 +1,9 @@
 from time import time, strftime, gmtime
 
+from pymongo import MongoClient
+
 import methods.defaults as d
 from methods.utils import safe_division
-
-from pymongo import MongoClient
 
 
 class Method:

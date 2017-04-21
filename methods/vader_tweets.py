@@ -1,5 +1,4 @@
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
-import operator
 
 import methods.defaults as d
 from methods.method import Method
