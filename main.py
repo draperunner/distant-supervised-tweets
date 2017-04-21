@@ -133,6 +133,7 @@ def compare_for_each_semeval_set():
         q['semeval_set'] = set
         for method in run_and_train_methods(q):
             print(method.name + "\t" + str(method.F1_pnn))
+        print()
 
 
 def create_datasets():
