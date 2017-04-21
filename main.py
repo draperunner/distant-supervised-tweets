@@ -102,8 +102,8 @@ def run_and_train_methods(q=query):
         VaderTweets(query=q, threshold=0.1).run().test(),
         TextblobTweets(query=q, subjectivity_threshold=0.1, polarity_threshold=0.3).run().test(),
         LexiconClassifier(query=q).run().test(),
-        ComboTweets(query=q, a=0, b=4, c=4, d=2).run().test(),
-        ComboTweets(query=q, a=3, b=1, c=1, d=1).run().test()
+        ComboTweets(query=q, name="ComboA", a=0, b=4, c=4, d=2).run().test(),
+        ComboTweets(query=q, name="ComboB", a=3, b=1, c=1, d=1).run().test()
     ]
 
 

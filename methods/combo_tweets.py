@@ -7,10 +7,10 @@ from methods.method import Method
 
 
 class ComboTweets(Method):
-    def __init__(self, positive_file=d.POSITIVE_FILE, negative_file=d.NEGATIVE_FILE, neutral_file=d.NEUTRAL_FILE,
+    def __init__(self, name="Combo", positive_file=d.POSITIVE_FILE, negative_file=d.NEGATIVE_FILE, neutral_file=d.NEUTRAL_FILE,
                  db_name=d.DB_NAME, collection_name=d.COLLECTION_NAME, query=d.QUERY, preprocess=d.PREPROCESS,
                  subjectivity_threshold=0.1, polarity_threshold=0, save=d.SAVE, verbose=d.VERBOSE, a=1, b=1, c=1, d=3):
-        Method.__init__(self, name="TEXTBLOB", db_name=db_name, collection_name=collection_name, query=query, negative_file=negative_file,
+        Method.__init__(self, name=name, db_name=db_name, collection_name=collection_name, query=query, negative_file=negative_file,
                         positive_file=positive_file, neutral_file=neutral_file, preprocess=preprocess, save=save, verbose=verbose)
         self.subjectivity_threshold = subjectivity_threshold
         self.polarity_threshold = polarity_threshold
