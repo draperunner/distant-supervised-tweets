@@ -131,8 +131,8 @@ def compare_for_each_semeval_set():
         print(set)
         q = copy.copy(query)
         q['semeval_set'] = set
-        for method in run_and_train_methods():
-            print(method.name + "\t" + method.F1_pnn)
+        for method in run_and_train_methods(q):
+            print(method.name + "\t" + str(method.F1_pnn))
 
 # grid_search_vader(1, 9)
 # grid_search_textblob(1, 4)
