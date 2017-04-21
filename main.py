@@ -114,4 +114,18 @@ def compare_methods():
     ComboTweets(query=query, a=0, b=4, c=4, d=2).run().test().latex()
     ComboTweets(query=query, a=3, b=1, c=1, d=1).run().test().latex()
 
-compare_methods()
+def create_datasets():
+    AfinnTweets(query=query, save=True).run()
+    EmoticonTweets(query=query, save=True).run()
+    EmoticonExtendedTweets(query=query, save=True).run()
+    VaderTweets(query=query, threshold=0.1, save=True).run()
+    TextblobTweets(query=query, subjectivity_threshold=0.1, polarity_threshold=0.3, save=True).run()
+    LexiconClassifier(query=query, save=True).run()
+    ComboTweets(query=query, a=0, b=4, c=4, d=2, save=True).run()
+    ComboTweets(query=query, a=3, b=1, c=1, d=1, save=True).run()
+
+# compare_methods()
+
+# LexiconClassifier(query=query, save=True).run()
+
+create_datasets()
