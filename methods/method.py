@@ -19,17 +19,15 @@ class Method:
         self.negative_file = negative_file
         self.neutral_file = neutral_file
 
-        # MongoDB connection
-        client = MongoClient()
-        self.db = client[db_name]
-        self.collection = self.db[collection_name]
+        self.db_name = db_name
+        self.collection_name = collection_name
         self.query = query
 
         self.sentiment_map = {}
 
         self.preprocessor = preprocess
 
-        self.total_num_tweets = self.collection.find(query).count()
+        self.total_num_tweets = -1
         self.num_tweets = -1
         self.run_time = -1
 
@@ -62,12 +60,20 @@ class Method:
     def run(self):
         start_time = time()
 
+        # MongoDB connection
+        client = MongoClient()
+        db = client[self.db_name]
+        collection = db[self.collection_name]
+
+        self.total_num_tweets = collection.find().count()
+
         if self.save:
             pos_file = open(self.positive_file, "w+")
             neg_file = open(self.negative_file, "w+")
             neu_file = open(self.neutral_file, "w+")
 
-        tweets = self.collection.find(self.query)
+
+        tweets = collection.find(self.query)
         total_num_tweets = tweets.count()
 
         for index, tweet in enumerate(tweets):

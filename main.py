@@ -1,7 +1,7 @@
 import copy
 import re
 
-import multiprocessing
+from utils.parallel import parmap
 import preprocessor as p
 from pymongo import MongoClient
 
@@ -134,20 +134,22 @@ def compare_for_each_semeval_set():
 
 
 def create_datasets():
-    AfinnTweets(query=query, save=True).run()
-    EmoticonTweets(query=query, save=True).run()
-    EmoticonExtendedTweets(query=query, save=True).run()
-    VaderTweets(query=query, threshold=0.1, save=True).run()
-    TextblobTweets(query=query, subjectivity_threshold=0.1, polarity_threshold=0.3, save=True).run()
-    LexiconClassifier(query=query, save=True).run()
-    ComboTweets(query=query, a=0, b=4, c=4, d=2, save=True).run()
-    ComboTweets(query=query, a=3, b=1, c=1, d=1, save=True).run()
+    parmap(lambda x: x.run().print(), [
+        AfinnTweets(query=query, save=True),
+        EmoticonTweets(query=query, save=True),
+        EmoticonExtendedTweets(query=query, save=True),
+        VaderTweets(query=query, threshold=0.1, save=True),
+        TextblobTweets(query=query, subjectivity_threshold=0.1, polarity_threshold=0.3, save=True),
+        LexiconClassifier(query=query, save=True),
+        ComboTweets(query=query, name="ComboA", a=0, b=4, c=4, d=2, save=True),
+        ComboTweets(query=query, name="ComboB", a=3, b=1, c=1, d=1, save=True)
+    ])
 
 # compare_methods()
 
 # LexiconClassifier(query=query, save=True).run()
 
-# create_datasets()
+create_datasets()
 
 # compare_methods()
-compare_for_each_semeval_set()
+# compare_for_each_semeval_set()
