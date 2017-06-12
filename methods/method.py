@@ -63,20 +63,21 @@ class Method:
         # MongoDB connection
         client = MongoClient()
         db = client[self.db_name]
-        collection = db[self.collection_name]
+        self.collection = db[self.collection_name]
 
-        self.total_num_tweets = collection.find().count()
+        self.total_num_tweets = self.collection.find().count()
 
         if self.save:
             pos_file = open(self.positive_file, "w+")
             neg_file = open(self.negative_file, "w+")
             neu_file = open(self.neutral_file, "w+")
 
-
-        tweets = collection.find(self.query)
+        tweets = self.collection.find(self.query)
         total_num_tweets = tweets.count()
 
-        for index, tweet in enumerate(tweets):
+        index = -1
+        for tweet in tweets:
+            index += 1
 
             # Print progress if verbose
             if self.verbose and index % 10000 == 0:
